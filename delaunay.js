@@ -1,74 +1,3 @@
-function Edge(v0, v1) {
-    this.v0 = v0;
-    this.v1 = v1;
-}
-
-function Triangle(v0, v1, v2) {
-    this.v0 = v0;
-    this.v1 = v1;
-    this.v2 = v2;
-
-    this.CalcCircumcircle();
-}
-
-Triangle.prototype.CalcCircumcircle = function () {
-
-    var A = this.v1.x - this.v0.x;
-    var B = this.v1.y - this.v0.y;
-    var C = this.v2.x - this.v0.x;
-    var D = this.v2.y - this.v0.y;
-
-    var E = A * (this.v0.x + this.v1.x) + B * (this.v0.y + this.v1.y);
-    var F = C * (this.v0.x + this.v2.x) + D * (this.v0.y + this.v2.y);
-
-    var G = 2.0 * (A * (this.v2.y - this.v1.y) - B * (this.v2.x - this.v1.x));
-
-    var dx, dy;
-
-    if (Math.abs(G) < EPSILON) {
-        // Collinear - find extremes and use the midpoint
-
-        function max3(a, b, c) {
-            return ( a >= b && a >= c ) ? a : ( b >= a && b >= c ) ? b : c;
-        }
-
-        function min3(a, b, c) {
-            return ( a <= b && a <= c ) ? a : ( b <= a && b <= c ) ? b : c;
-        }
-
-        var minx = min3(this.v0.x, this.v1.x, this.v2.x);
-        var miny = min3(this.v0.y, this.v1.y, this.v2.y);
-        var maxx = max3(this.v0.x, this.v1.x, this.v2.x);
-        var maxy = max3(this.v0.y, this.v1.y, this.v2.y);
-
-        this.center = new Vertex(( minx + maxx ) / 2, ( miny + maxy ) / 2);
-
-        dx = this.center.x - minx;
-        dy = this.center.y - miny;
-    }
-    else {
-        var cx = (D * E - B * F) / G;
-        var cy = (A * F - C * E) / G;
-
-        this.center = new Vertex(cx, cy);
-
-        dx = this.center.x - this.v0.x;
-        dy = this.center.y - this.v0.y;
-    }
-
-    this.radius_squared = dx * dx + dy * dy;
-    this.radius = Math.sqrt(this.radius_squared);
-};
-
-Triangle.prototype.InCircumcircle = function (v) {
-    var dx = this.center.x - v.x;
-    var dy = this.center.y - v.y;
-    var dist_squared = dx * dx + dy * dy;
-
-    return (dist_squared <= this.radius_squared);
-
-};
-
 function Triangulate(vertices) {
 
     var triangles = [];
@@ -77,12 +6,7 @@ function Triangulate(vertices) {
 
     triangles.push(st);
 
-    //
-    // Next, begin the triangulation one vertex at a time
-    //
-    var i;
-
-    for (i in vertices) {
+    for (var i in vertices) {
         // NOTE: This is O(n^2) - can be optimized by sorting vertices
         // along the x-axis and only considering triangles that have
         // potentially overlapping circumcircles
