@@ -1,4 +1,6 @@
-function triangulate(vertices) {
+function triangulate(vertices, removeBoundingTriangle) {
+
+    removeBoundingTriangle = removeBoundingTriangle || "yes";
 
     var triangles = [];
 
@@ -18,49 +20,19 @@ function triangulate(vertices) {
     //
     // Remove triangles that shared edges with "supertriangle"
     //
-    for (var i in triangles) {
-        var triangle = triangles[i];
+    if (removeBoundingTriangle == "yes") {
+        for (var i in triangles) {
+            var triangle = triangles[i];
 
-        if (triangle.v0 == st.v0 || triangle.v0 == st.v1 || triangle.v0 == st.v2 ||
-            triangle.v1 == st.v0 || triangle.v1 == st.v1 || triangle.v1 == st.v2 ||
-            triangle.v2 == st.v0 || triangle.v2 == st.v1 || triangle.v2 == st.v2) {
-            delete triangles[i];
+            if (triangle.v0 == st.v0 || triangle.v0 == st.v1 || triangle.v0 == st.v2 ||
+                triangle.v1 == st.v0 || triangle.v1 == st.v1 || triangle.v1 == st.v2 ||
+                triangle.v2 == st.v0 || triangle.v2 == st.v1 || triangle.v2 == st.v2) {
+                delete triangles[i];
+            }
         }
     }
 
     return triangles;
-}
-
-function createBoundingTriangle(vertices) {
-    // NOTE: There's a bit of a heuristic here. If the bounding triangle
-    // is too large and you see overflow/underflow errors. If it is too small
-    // you end up with a non-convex hull.
-
-    var minx, miny, maxx, maxy;
-    for (var i in vertices) {
-        var vertex = vertices[i];
-        if (minx === undefined || vertex.x < minx) {
-            minx = vertex.x;
-        }
-        if (miny === undefined || vertex.y < miny) {
-            miny = vertex.y;
-        }
-        if (maxx === undefined || vertex.x > maxx) {
-            maxx = vertex.x;
-        }
-        if (maxy === undefined || vertex.y > maxy) {
-            maxy = vertex.y;
-        }
-    }
-
-    var dx = (maxx - minx) * 1000;
-    var dy = (maxy - miny) * 1000;
-
-    var stv0 = new Vertex(minx - dx, miny - dy * 3);
-    var stv1 = new Vertex(minx - dx, maxy + dy);
-    var stv2 = new Vertex(maxx + dx * 3, maxy + dy);
-
-    return new Triangle(stv0, stv1, stv2);
 }
 
 function addVertex(vertex, triangles) {
@@ -120,3 +92,34 @@ function uniqueEdges(edges) {
     return uniqueEdges;
 }
 
+function createBoundingTriangle(vertices) {
+    // NOTE: There's a bit of a heuristic here. If the bounding triangle
+    // is too large and you see overflow/underflow errors. If it is too small
+    // you end up with a non-convex hull.
+
+    var minx, miny, maxx, maxy;
+    for (var i in vertices) {
+        var vertex = vertices[i];
+        if (minx === undefined || vertex.x < minx) {
+            minx = vertex.x;
+        }
+        if (miny === undefined || vertex.y < miny) {
+            miny = vertex.y;
+        }
+        if (maxx === undefined || vertex.x > maxx) {
+            maxx = vertex.x;
+        }
+        if (maxy === undefined || vertex.y > maxy) {
+            maxy = vertex.y;
+        }
+    }
+
+    var dx = (maxx - minx) * 1000;
+    var dy = (maxy - miny) * 1000;
+
+    var stv0 = new Vertex(minx - dx, miny - dy * 3);
+    var stv1 = new Vertex(minx - dx, maxy + dy);
+    var stv2 = new Vertex(maxx + dx * 3, maxy + dy);
+
+    return new Triangle(stv0, stv1, stv2);
+}
