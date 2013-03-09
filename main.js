@@ -1,17 +1,18 @@
 var vertices = [];
 
-function AddAt(x, y) {
-    vertices.push(new Vertex(x, y));
-}
-
 $(document).ready(function () {
     var board = new Board();
 
+
     $("#board").click(function (e) {
         e = e ? e : window.event;
-        AddAt(e.clientX - this.offsetLeft, e.clientY - this.offsetTop);
 
-        var triangles = Triangulate(vertices);
+        var x = e.clientX - this.offsetLeft;
+        var y = e.clientY - this.offsetTop;
+
+        vertices.push(new Vertex(x, y));
+
+        var triangles = triangulate(vertices);
 
         board.erease();
 
@@ -29,7 +30,7 @@ $(document).ready(function () {
         for (i in triangles) {
             var triangle = triangles[i];
             board.drawPolygonWithPoints([triangle.v0, triangle.v1, triangle.v2], "lightblue");
-            board.drawCircle({cx: triangle.center.x, cy: triangle.center.y, radius: triangle.radius}, "rgba(128,0,0,0.1)");
+            board.drawCircle({cx: triangle.circumcircle.center.x, cy: triangle.circumcircle.center.y, radius: triangle.circumcircle.radius}, "rgba(128,0,0,0.1)");
         }
 
         var algorithm;

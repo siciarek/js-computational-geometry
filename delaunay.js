@@ -1,8 +1,8 @@
-function Triangulate(vertices) {
+function triangulate(vertices) {
 
     var triangles = [];
 
-    var st = CreateBoundingTriangle(vertices);
+    var st = createBoundingTriangle(vertices);
 
     triangles.push(st);
 
@@ -12,7 +12,7 @@ function Triangulate(vertices) {
         // potentially overlapping circumcircles
 
         var vertex = vertices[i];
-        AddVertex(vertex, triangles);
+        addVertex(vertex, triangles);
     }
 
     //
@@ -31,7 +31,7 @@ function Triangulate(vertices) {
     return triangles;
 }
 
-function CreateBoundingTriangle(vertices) {
+function createBoundingTriangle(vertices) {
     // NOTE: There's a bit of a heuristic here. If the bounding triangle
     // is too large and you see overflow/underflow errors. If it is too small
     // you end up with a non-convex hull.
@@ -53,18 +53,17 @@ function CreateBoundingTriangle(vertices) {
         }
     }
 
-    var dx = ( maxx - minx ) * 10;
-    var dy = ( maxy - miny ) * 10;
+    var dx = (maxx - minx) * 1000;
+    var dy = (maxy - miny) * 1000;
 
     var stv0 = new Vertex(minx - dx, miny - dy * 3);
     var stv1 = new Vertex(minx - dx, maxy + dy);
     var stv2 = new Vertex(maxx + dx * 3, maxy + dy);
 
     return new Triangle(stv0, stv1, stv2);
-
 }
 
-function AddVertex(vertex, triangles) {
+function addVertex(vertex, triangles) {
     var edges = [];
 
     // Remove triangles with circumcircles containing the vertex
@@ -73,17 +72,15 @@ function AddVertex(vertex, triangles) {
     for (i in triangles) {
         var triangle = triangles[i];
 
-        if (triangle.InCircumcircle(vertex)) {
-
+        if (triangle.circumcircle.isInside(vertex)) {
             edges.push(new Edge(triangle.v0, triangle.v1));
             edges.push(new Edge(triangle.v1, triangle.v2));
             edges.push(new Edge(triangle.v2, triangle.v0));
-
             delete triangles[i];
         }
     }
 
-    edges = UniqueEdges(edges);
+    edges = uniqueEdges(edges);
 
     // Create new triangles from the unique edges and new vertex
     for (i in edges) {
@@ -92,7 +89,7 @@ function AddVertex(vertex, triangles) {
     }
 }
 
-function UniqueEdges(edges) {
+function uniqueEdges(edges) {
     // TODO: This is O(n^2), make it O(n) with a hash or some such
 
     var uniqueEdges = [];
