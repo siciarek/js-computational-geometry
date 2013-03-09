@@ -1,6 +1,5 @@
-var vertices = [];
-
-
+var num = 256;
+var margin = 0.03;
 
 function displayResult(board) {
 
@@ -44,11 +43,12 @@ function displayResult(board) {
     }
 }
 
+var vertices = [];
 
 $(document).ready(function () {
     var board = new Board();
 
-    vertices = getSetOfVertices();
+    vertices = getSetOfVertices(num, margin);
 
     displayResult(board);
 
